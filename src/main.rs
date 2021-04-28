@@ -4,7 +4,9 @@ use ggez::conf::{WindowMode, WindowSetup};
 use ggez::{event, ContextBuilder};
 
 fn main() -> Result<()> {
-    let window_setup = WindowSetup::default().title("Exploring Draw Peformance");
+    let window_setup = WindowSetup::default()
+        .title("Exploring Draw Peformance")
+        .vsync(false);
     let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);
 
     let (mut context, mut event_loop) =

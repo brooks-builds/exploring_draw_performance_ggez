@@ -5,24 +5,29 @@ use bbecs::world::{World, WorldMethods, ENTITY_ID};
 use draw_system::draw_system;
 use eyre::Result;
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawMode, MeshBuilder, BLACK, WHITE};
+use ggez::graphics::{self, Color, DrawMode, Mesh, MeshBuilder, BLACK, WHITE};
 use ggez::{timer, Context};
 use rand::Rng;
+use repurpose_spark_system::repurpose_spark_system;
 use update_color_system::update_color_system;
 use update_movement_system::update_movement_system;
 
 mod accelerate_system;
 mod draw_system;
+mod repurpose_spark_system;
 mod update_color_system;
+mod update_meshes_system;
 mod update_movement_system;
 
 pub struct MainState {
     world: World,
+    sparks_created: u32,
 }
 
 impl MainState {
     pub fn new(context: &mut Context) -> Result<Self> {
         let mut world = World::new();
+        let sparks_created = 0;
 
         world.register("location")?;
         world.register("velocity")?;
@@ -30,7 +35,16 @@ impl MainState {
         world.register("mesh")?;
         world.register("color")?;
 
-        Ok(Self { world })
+        let spark_mesh = MeshBuilder::new()
+            .circle(DrawMode::fill(), [0.0, 0.0], 5.0, 0.1, WHITE)
+            .build(context)?;
+
+        world.add_resource("mesh".to_owned(), spark_mesh);
+
+        Ok(Self {
+            world,
+            sparks_created,
+        })
     }
 
     fn create_particle(&mut self, context: &mut Context) -> Result<()> {
@@ -60,20 +74,20 @@ impl MainState {
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut ggez::Context) -> ggez::GameResult {
         while timer::check_update_time(context, 60) {
-            for _ in 0..42 {
-                self.create_particle(context).unwrap();
+            if timer::ticks(context) % 200 == 0 {
+                let fps = timer::fps(context);
+                if fps > 60.0 {
+                    self.create_particle(context).unwrap();
+                    self.sparks_created += 1;
+                }
+                dbg!(fps);
+                dbg!(self.sparks_created);
             }
             update_movement_system(&self.world).unwrap();
             accelerate_system(&self.world).unwrap();
             update_color_system(&self.world).unwrap();
+            repurpose_spark_system(&self.world, context).unwrap();
             self.world.update().unwrap();
-
-            if timer::ticks(context) % 200 == 0 {
-                dbg!(timer::fps(context));
-                let query;
-                let (ids,) = query!(self.world, query, ENTITY_ID);
-                dbg!(ids.len());
-            }
         }
         Ok(())
     }

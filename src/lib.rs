@@ -81,7 +81,7 @@ impl EventHandler for MainState {
                     self.sparks_created += 1;
                 }
                 dbg!(fps);
-                dbg!(self.sparks_created);
+                dbg!(self.sparks_created); // we got around 9720
             }
             update_movement_system(&self.world).unwrap();
             accelerate_system(&self.world).unwrap();

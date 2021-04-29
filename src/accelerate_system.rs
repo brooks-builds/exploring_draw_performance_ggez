@@ -3,7 +3,7 @@ use bbecs::data_types::point::Point;
 use bbecs::query;
 use bbecs::world::{DataWrapper, World};
 use eyre::Result;
-use rand::{random, thread_rng, Rng};
+use rand::{thread_rng, Rng};
 
 pub fn accelerate_system(world: &World) -> Result<()> {
     let query;

@@ -1,10 +1,9 @@
 use bbecs::components::CastComponents;
 use bbecs::data_types::point::Point;
-use bbecs::resources::resource::ResourceCast;
+use bbecs::query;
 use bbecs::world::{DataWrapper, World};
-use bbecs::{get_resource, query};
 use eyre::Result;
-use ggez::graphics::{self, Color, DrawMode, DrawParam, Mesh, MeshBuilder};
+use ggez::graphics::{self, Color, DrawMode, DrawParam, MeshBuilder};
 use ggez::Context;
 
 pub fn draw_system(context: &mut Context, world: &World) -> Result<()> {
@@ -12,7 +11,7 @@ pub fn draw_system(context: &mut Context, world: &World) -> Result<()> {
     let (locations, colors) = query!(world, query, "location", "color");
     let mut mesh_builder = MeshBuilder::new();
 
-    if locations.len() == 0 {
+    if locations.is_empty() {
         return Ok(());
     }
 

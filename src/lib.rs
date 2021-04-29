@@ -1,11 +1,10 @@
 use accelerate_system::accelerate_system;
 use bbecs::data_types::point::Point;
-use bbecs::query;
-use bbecs::world::{World, WorldMethods, ENTITY_ID};
+use bbecs::world::{World, WorldMethods};
 use draw_system::draw_system;
 use eyre::Result;
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawMode, Mesh, MeshBuilder, BLACK, WHITE};
+use ggez::graphics::{self, Color, DrawMode, MeshBuilder, BLACK, WHITE};
 use ggez::{timer, Context};
 use rand::Rng;
 use repurpose_spark_system::repurpose_spark_system;
@@ -73,14 +72,13 @@ impl MainState {
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut ggez::Context) -> ggez::GameResult {
-        if self.sparks_created == 0 {
-            for _ in 0..500 {
-                self.create_particle(context).unwrap();
-                self.sparks_created += 500;
-            }
-        }
+        if self.sparks_created < 9720 {
+            self.create_particle(context).unwrap();
+            self.sparks_created += 1;
+        } else {
+            println!("all done adding sparks");
+        };
         while timer::check_update_time(context, 60) {
-            let fps = timer::fps(context);
             update_movement_system(&self.world).unwrap();
             accelerate_system(&self.world).unwrap();
             update_color_system(&self.world).unwrap();

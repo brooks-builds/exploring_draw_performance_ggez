@@ -73,16 +73,14 @@ impl MainState {
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut ggez::Context) -> ggez::GameResult {
-        while timer::check_update_time(context, 60) {
-            if timer::ticks(context) % 200 == 0 {
-                let fps = timer::fps(context);
-                if fps > 60.0 {
-                    self.create_particle(context).unwrap();
-                    self.sparks_created += 1;
-                }
-                dbg!(fps);
-                dbg!(self.sparks_created); // we got around 9720
+        if self.sparks_created == 0 {
+            for _ in 0..500 {
+                self.create_particle(context).unwrap();
+                self.sparks_created += 500;
             }
+        }
+        while timer::check_update_time(context, 60) {
+            let fps = timer::fps(context);
             update_movement_system(&self.world).unwrap();
             accelerate_system(&self.world).unwrap();
             update_color_system(&self.world).unwrap();
